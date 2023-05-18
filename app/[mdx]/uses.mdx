@@ -1,0 +1,61 @@
+# /uses
+
+Random stuff I use, will probably write a page for each.
+
+## fzf
+
+I was hesitant to use it at first but now I don't thing I could live without it.
+
+## Ubuntu
+
+I like normie Linux.
+Eventually I'll try desktop Alpine and NixOS.
+
+## xterm
+
+Just the fastest terminal.
+I like the low input lag
+and it's fast enought to use as a program launcher
+(think `dmenu` replacement).
+
+## vim (nvim)
+
+I'm currently switching from "tpope standard" Vim to a Neovim setup with all the bells and whistles.
+
+See [/vim](/vim).
+
+## vim's netrw
+
+I tried `ranger`, `lf` and even `shfm` but `netrw`'s tree view is much nicer. There's less context-switching.
+
+These are more file-browsers that file-managers.
+Doing anything more complex than a delete or a rename feels "dirty".
+
+## "alt" utils
+
+* `entr`
+  * `onchange` - https://www.npmjs.com/package/onchange
+* moreutils:
+  * `vipe` - `cmd1 | vipe | cmd2`
+  * `vidir` - like `roamer` but good
+* `tldr`
+
+## manpages-posix
+
+It's not about making sure everything is portable.
+The POSIX manpages are just nicer to read.
+
+Your package manager probably has packages called
+`manpages-posix` (section 1posix) and
+`manpages-posix-dev` (sections 3posix and 7posix).
+You can also get them from
+[kernel.org](https://mirrors.edge.kernel.org/pub/linux/docs/man-pages/man-pages-posix/)
+(as sections 1p, 3p and 7p).
+
+Here's how you make them the default:
+```diff
+# Ubuntu defaults:
+export MANSECT='1:n:l:8:3:0:2:3posix:3pm:3perl:3am:5:4:9:6:7'
+# Same but Nposix before N:
+export MANSECT='1posix:1:n:l:8:3posix:3:0:2:3pm:3perl:3am:5:4:9:6:7posix:7'
+```

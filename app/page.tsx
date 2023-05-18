@@ -1,8 +1,11 @@
-import Image from 'next/image'
+import dynamic from "next/dynamic"
+import Prose from "./prose"
 
-export default function Home() {
+export default function Page() {
+  const Mdx = dynamic(() => import("./[mdx]/README.mdx"))
   return (
-    <main className="">
-    </main>
+    <Prose>
+      <Mdx />
+    </Prose>
   )
 }

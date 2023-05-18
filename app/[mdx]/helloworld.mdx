@@ -1,0 +1,23 @@
+# Hello World - how this website is built
+
+## TLDR
+
+Next, with MDX, Tailwind, the Tailwind prose plugin, and 1 or 2 shadcn/ui components.
+
+## Rawdogging MDX
+
+Even though I probably should, for now I'm not using
+[contentlayer](https://www.contentlayer.dev/)
+or
+[mdx-bundler](https://github.com/kentcdodds/mdx-bundler).
+I just dynamically import MDX based on the path parameter:
+
+```
+// app/[mdx]/page.tsx
+import dynamic from 'next/dynamic'
+
+export default function Page({ params }: any) {
+  const Mdx = dynamic(() => import(`./${params.mdx}.mdx`))
+  return <Mdx />
+}
+```

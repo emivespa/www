@@ -1,0 +1,69 @@
+# bash is mostly tips and tricks
+
+Resources:
+
+* [pure bash bible  ](https://github.com/dylanaraps/pure-bash-bible)
+* [pure sh bible    ](https://github.com/dylanaraps/pure-sh-bible)
+
+## check for dependences
+
+```
+command -v "$dep" >/dev/null 2>&1 || exit 1
+```
+
+You can also use `which`, but `command -v` is more portable.
+
+If there's more than one command you can use
+(like curl/wget, vim/nvim or something like that)
+
+```
+command -v "$either" "$or"
+```
+
+will zero if at least one is available,
+but you can use this to asign the first available command to a variable:
+
+```
+cmd="$(command -v curl || command -v wget)" || exit 1
+```
+
+## one-liner dump
+
+```
+(cd "$dir" || exit; cmd) # Run cmd(s) in a directory. Poor man's pushd/popd.
+(cd "$src" && tar -cf - .) | (cd "$dest" && tar -xpf -) # https://web.archive.org/web/20100618145931/http://blog.extracheese.org/2010/05/the-tar-pipe.html
+(set -x; "$cmd") # Print cmd(s) before running them.
+awk 'BEGIN { print srand() }' # Portable unix epoch date (date +%s is a GNU extension). https://lobste.rs/s/uk5esr/rich_s_sh_posix_shell_tricks#c_rghtbb
+awk '{print $NF,$0}' | sort | cut -f2- -d' ' # Sort by last word.
+aws s3 cp "${s3object}" - | vipe | aws s3 cp - "${s3object}" # Edit s3 object as if in place.
+aws s3 presign "${bucket}" --expires-in "${secs}" # Create an expiring link for an s3 bucket.
+cat "${@:-/dev/null}" # cat argumets, but don't listen for stdin if there arent any. #script
+curl http://169.254.169.254/latest/user-data # See last UserData run. #aws #ec2
+date +'%Y-%j' # Day-of-year date
+date +'%Y-%m-%d' # ISO date, YYYY-mm-dd
+date +'%d %B %Y' # Spelled-out-month unambiguous human-readable date
+date +'%d %B %Y' # Unambiguous human readable date
+date -u +'%Y%m%d%H%M%S' # file sorting date
+diff "$file" <(xsel -ob) # Diff file against clipboard contents. #bash
+docker ps -aq | xargs docker rm # rm all stopped containers.
+docker ps -aq | xargs docker rm -f # rm all containers.
+export MANSECT='1p:1:n:l:8:3p:3:0p:0:2:3posix:3pm:3perl:3am:5:4:9:6:7' # Search POSIX manpages before regular ones (manpages-posix package usually). #config
+fmt | sed 's/\. /\. /g' | fmt # fmt preventing 2 spaces after a period.
+git gc --prune-all # Reshallow git repo.
+git log --format='%aN' | sort -u # List contributors to a project.
+head -n"$n" | tail -n1 # Print nth line.
+ls -d .* # Print only hidden entries.
+mkfifo hello; script -f hello # https://www.youtube.com/watch?v=4YK9Qb3PVS0&t=24s
+printf %s "$(cat -)" # Soak up standard input and write to a file.
+printf %s\\n "$(cat -)" # Poor man's `sponge` from moreutils.
+printf %s\\n 'Press C-d to continue or C-c to cancel:'; cat >/dev/null # Lazy man's [yes/no] prompt. #script
+shellcheck -f diff # Even if you don't mean to auto-apply the fixes, you'll probably find it nicer.
+shellcheck -f diff | patch -p1 # Apply shellcheck auto-fixes.
+trap trap_func ERR # Shell trap, script exit on error. #script
+trap trap_func EXIT # Shell trap, script exit. #script
+trap trap_func SIGINT # Shell trap, Ctrl-C. #script
+vi "$(fzf)" # Pick a file to edit with fzf.
+vipe | "$cmd" # Write input for cmd in your preferred editor.
+while read -r line; do "${cmd}" "${line}"; done # Shell while loop
+xsel -ob | vipe | xsel -ib # Edit clipboard contents as if in place.
+```

@@ -1,0 +1,66 @@
+# vim
+
+Resources:
+
+* ["you don't grok vi."    ](https://stackoverflow.com/questions/1218390/what-is-your-most-productive-shortcut-with-vim)
+* [Arabesque vim archives  ](https://blog.sanctum.geek.nz/category/vim/)
+* [r/vim's vimrc tips      ](https://www.reddit.com/r/vim/wiki/vimrctips)
+* [romainl/vim-gists.md    ](https://gist.github.com/romainl/4b9f139d2a8694612b924322de1025ce)
+* [vim fortunes            ](https://github.com/openuado/vimtips-fortune/tree/master)
+* [vimtips.html            ](http://zzapper.co.uk/vimtips.html)
+
+## vim as MANPAGER
+
+```
+# ~/.profile
+export MANPAGER="vim -R --not-a-term -c'runtime plugin/manpager.vim | MANPAGER' -"
+if command -v 'nvim' >/dev/null 2>&1; then
+	export MANPAGER="nvim -c'runtime plugin/man.lua | Man!' -"
+fi
+```
+
+explained:
+
+```
+#                    v Read only mode.
+#                    v  v prevent "Reading from stdin...". (Not available/necessary in nvim.)
+#                    v  v            v Make sure the plugin is loaded, just in case.
+export MANPAGER="vim -R --not-a-term -c'runtime plugin/manpager.vim | MANPAGER' -"
+```
+
+## vimpager
+
+The script at
+`/usr/share/vim/vim82/macros/less.sh`
+(where 82 might be whatever version)
+is way too complex,
+this does the same thing:
+
+```
+if test -t 1; then
+	vi -c 'set nomodifiable readonly' "${@:--}"
+else
+	cat "${@:--}"
+fi
+```
+
+## vipe
+
+> ```
+> SYNOPSIS
+>        command1 | vipe | command2
+> ```
+
+Pretty self explanatory. It's from
+[moreutils](https://joeyh.name/code/moreutils/)
+
+## poor man's vimanywhere
+
+Every once in a while a "vimanywhere" comes out: a tool to have vim in
+any input. They're usually somewhat hacky and a pain to set up, but with
+`vipe`, you can pipe clipboard contents through your editor, that's:
+
+```
+xsel -bo | vipe | xsel -bi  # for Linux.
+pbpaste | vipe | pbcopy     # for Mac (probably).
+```
