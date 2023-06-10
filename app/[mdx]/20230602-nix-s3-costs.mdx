@@ -1,0 +1,357 @@
+# RE: *The NixOS Foundation’s Call to Action: S3 Costs Require Community Support*
+
+The discussion was so meaty I started taking notes. Emphasis is mine
+
+## discourse
+
+### OP
+
+> TL;DR - Kicking off an effort to secure long-term funding for our S3 costs and
+> exploring alternatives. This comes after multiple years where Logicblox has
+> been graciously sponsoring the S3 costs for Nix! An enormous thank you to
+> them.
+>
+> The LogicBlox team (which has since been acquired by Infor) has been providing
+> significant support to the Nix ecosystem by sponsoring our S3 buckets. They
+> have asked to transfer the ownership of the costs and give us a good heads up
+> (timeline discussed below). We are now working on transferring the
+> expenses/ownership to the foundation.
+
+> **Estimated Monthly Costs - ~$9000** / month for hosting cache.nixos.org 197,
+> see the breakdown for more details 880.
+
+> **Deadline** - Aiming for **July 1st**
+
+> * Migrating the buckets to **Cloudflare R2** 148, and using the generous OSS
+>   sponsorship offer they recently announced 288. That would incur a fixed cost
+>   of around **$32k** for the migration.
+
+> * Keeping the budget, but **garbage-collecting** it. We could shrink probably
+>   shrink the costs a lot (realistically up to 70%), but there are heavy
+>   tradeoffs at play here since the data in the cache is sometimes very
+>   valuable.
+
+#### Breakdown mentioned
+
+Some info on our AWS costs (primarily cache.nixos.org and releases.nixos.org):
+
+> * The S3 bucket for **cache.nixos.org** stores 667M objects, with **107 TiB in
+>   standard storage** and **318 TiB in infrequent access storage**, so **425 TiB in
+>   total**.
+>
+> * The S3 bucket for **nix-releases** (i.e. https://releases.nixos.org 5) is **25.1 TiB**
+>   (mostly ISO images).
+>
+> * The S3 **storage** costs for our sponsor are about **$5500 per month**, after a $2300
+>   enterprise discount.
+>
+> * The S3 **transfer costs** are about **$900 per month**, which is mostly from 29.5 TiB
+>   of traffic between S3 and Fastly for cache.nixos.org, and 2.6 TiB for
+>   releases.nixos.org. (This also appears to have a discount since the costs are
+>   $0.03 per GiB.)
+>
+> * Our Fastly traffic in April was 1508 TiB, so the CDN is amazingly effective.
+>
+> * The runtime closure of all non-beta NixOS releases (i.e. the store paths
+>   reachable from the store-paths.xz files in Channels for NixOS project(s) 5) is
+>   13M store paths, 27.1 TiB. So **garbage-collecting cache.nixos.org to only keep
+>   NixOS releases would shrink it to 6.3% of its current size**.
+>
+> * Note that this doesn’t include build-time-only dependencies like source
+>   tarballs.
+>
+> * The runtime closure of all non-beta NixOS releases and all Nixpkgs releases is
+>   51M store paths, 91.4 TiB, so about 21% of the bucket. Unfortunately Nixpkgs
+>   has no stable releases, they’re all marked as “pre”.
+>
+> * So **we can reduce storage costs by almost 80% by GCing everything that isn’t
+>   reachable from the store-paths.xz** files on releases.nixos.org.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/4
+
+V meaty. TODO.
+
+> ![](https://discourse.nixos.org/uploads/default/original/2X/a/a01b582d2cd02e0f8fb343eeaa4a3fd39df3ec18.png)
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/12
+
+> Another thing to keep in mind is that the NAR format is pretty wasteful on its
+> own, no matter if we compress the NAR files or not.
+>
+> A lot of the files inside a store path don’t actually change, and “exploding”
+> the NAR file and the structure into smaller parts gives a lot of possibility
+> for deduplication.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/15
+
+> We already discussed migrating alternatives from GitHub, e.g. to Codeberg,
+> IIRC, @davidak explored it. It didn’t scale.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/16
+
+> Small update, we are continuing to work on multiple communications thread with
+> AWS to figure out if there is a possibility to receive further support on the
+> topic.
+>
+> I’ve submitted us for the Cloudflare OSS program mentioned and will aim to have
+> a conversation with the team there as soon as possible.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/17
+
+> Another consideration for the s3 migration would be to leverage AWS Snowball
+> (AWS Snowball | Secure Edge Computing and Offline Data Transfer | Amazon Web
+> Services 33). It seems like it would help with the egress cost (~0.03/GB
+> instead of ~0.09/GB) and not require the destination to have a large network
+> pipe. Its essentially the modern version of a station wagon full of tapes.
+>
+> Specs of the storage-optimized snowball (AWS Snowball Edge Device
+> Specifications - AWS Snowball Edge Developer Guide 12) which we would need 2x
+> of:
+>
+> ```
+> Storage specifications:
+> NVME storage capacity 	210 TB usable (for object and NFS data transfer)
+> ```
+
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/18
+
+> I like the confluence of the two points around garbage collection and
+> deduplication. Both have a chance to recover (potentially rather large) total
+> storage space. **Staging builds (and older builds from unstable, and a
+> progressive list of others) are unlikely to ever be used, and could be
+> garbage-collected. Lots of things deduplicate (and compress) well in an
+> expanded store, as my own zfs-based instances demonstrate.**
+
+> The nice thing here is that despite this interaction, they’re not really in
+> competition with each other, except perhaps in some ivory-tower view of
+> wanting a perfect single solution. They can operate on different time-scales
+> to provide practical benefit and shrink the problem to more manageable levels
+> as things progress; we could collect some garbage now to reduce immediate
+> storage costs and potential transfer/migration costs (and time) while more
+> extensive storage format changes supporting dedup are developed and finalised.
+> **I can even imagine an approach where some of this historical data is archived
+> off elsewhere for a while, gc’d from the expensive cache, and maybe reinjected
+> again later.**
+>
+> Choosing which garbage to collect might be helped with some better data. **We
+> have a split of warm vs cold storage already, I assume that’s based on S3’s
+> automatic migration,** and it holds some clues (but there are caches in front,
+> so **regularly-used items might not get S3 activity**). Do we have stats on what
+> items are hit from Fastly, and a way to turn that into a view of which
+> closures are pulling things in?
+
+Yes, I belive you can get this data from the Fastly logs.
+
+TODO: link, same url as breakdown.
+
+### Storj pitch https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/19
+
+> Storj is **S3 compatible $4/TB/mo and $7/TB egress**. This isn’t $0/TB egress of
+> course, but might perhaps be a long-term sustainable option.
+>
+> **Migrations from S3 are free** (via our partnership with
+> https://www.cloudflyer.io/ 70, see their site for details). **Even though we are
+> decentralized storage, there isn’t any funny business with new protocols or
+> challenging technical adoption.** We work with any S3 or HTTP clients.
+>
+> We have 20,000 global points of presence, so **you don’t have to worry about
+> multiregion replication or content delivery**. We handle that for you as part of
+> the base product.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/22
+
+> Do deduplication using a deduplicating backup software such as bup or
+> bupstash, before the egress.
+>
+> I’ve investigated this a bit in Investigate deduplication to reduce storage
+> and transfer · Issue #89380 · NixOS/nixpkgs · GitHub
+>
+> In the latest post from today I found that a dedup factor of 3.5x (thus egress
+> cost reduction factor) seems immediately achievable.
+
+* https://github.com/NixOS/nixpkgs/issues/89380
+* https://github.com/NixOS/nixpkgs/issues/89380#issuecomment-1575550831
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/23
+
+> Free solutions are Cool and Good however: I don’t have an understanding the
+> scale of Nix in relation to cloud users in general, but it would probably be
+> necessary to discuss with any platform we migrate to, especially if they
+> aren’t huge, because the providers do in fact have costs, and the **free
+> solutions probably aren’t meant for a sudden ingress of 150TB and increasing,
+> in an ongoing manner**. :stuck_out_tongue:
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/25
+
+> Yes. Providers which credibly belong to the bandwidth alliance 42 for the
+> foreseeable future can be considered.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/26
+
+> **The current storage rate isn’t sustainable in the long run**, except if you want
+> to throw money away. This also has some ecological implications, the more you
+> store, the more hard drives must be spinning (and it’s not linear due to
+> redundancy).
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/31
+
+> @domenkozar @ron et al, I probably missed it above, but just wondering if we
+> have Intelligent Tiering (Amazon S3 Intelligent-Tiering Storage Class | AWS 2)
+> on the buckets?
+
+It was also strange to me.
+
+#### jackdk on matrix:
+
+ > A lot of people keep mentioning S3 Infrequent-Access (IA) tier and/or S3
+ > Intelligent Tiering.
+ > https://discourse.nixos.org/t/nixos-foundations-financial-summary-a-transparent-look-into-2022/28107/16
+ > shows that about 3/4 of the cache.nixos.org bucket is in IA already, and
+ > intelligent tiering automation charges will be $1667.50/month
+
+### BitTorrent was bound to come up https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/33
+
+> I’m curious if this would be possible by straight-up using torrents.
+> transmission provides a cli and there appears to be FUSE filesystems that will pull torrents on the fly.
+> With ~512Tb, it would be 4,400 users if they all provision 128gb and ~2,000 for caches of 512gb.~
+> I can’t do math apparently. 425 TiB is ~58412GB, so about 460 users with a 128GB cache, or 115 users with a 512GB cache
+> Torrenting is usually fast for me, but the only thing I’d be really worried about is residential internet upload speeds.
+>
+> If this were to happen, I’d happily donate a terabyte or two on a machine I have sitting.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/34
+
+> In my opinion **the problem with distributing storage load to users continues
+> to be that you need “guaranteed” availability**, and I think you don’t really
+> have that with a swarm. There are really several issues here that will
+> probably get conflated on-and-off.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/36
+
+> Also, an interesting point is: Half a petabyte in storage and 3 TB transfer a
+> day? Shit. That's nothing, unless... | Hacker News 90. Basically, if we agree
+> we don’t care about 99.9999whatever% reliability we could self-host the cache
+> and cut a substantial cost: it’s not that much data or bandwidth as it may
+> seem.
+
+In response to https://news.ycombinator.com/item?id=36173391
+
+> Half a petabyte in storage and 3 TB transfer a day? Shit. That's nothing,
+> unless you're "saving money by using the cloud".
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/37
+
+> I think we should seriously consider running and/or organizing our own
+> infrastructure here. I’m not a fan of being dependent on the goodwill of
+> corporations - they do fundamentally exist to turn a profit, and “paying for a
+> FOSS project’s storage” doesn’t generally do that, so eventually the tap runs
+> dry. In this case we got advance notice, but if we switch over to another
+> sponsored provider, there’s really no certainty that we won’t have much worse
+> luck next time.
+>
+> This amount of storage is well within range of what can be organized at small
+> scale, and 3TB of transfer is essentially nothing; even a $5 VPS gives you
+> that amount of traffic for free nowadays. At the very least we should probably
+> be paying for a cheap storage/hosting provider with some sort of hard
+> contractual obligation - whether it’s something like Backblaze B2 or just a
+> plain ol’ server with lots of hard drives at Hetzner/OVH/Leaseweb/etc.
+>
+> I don’t think decentralized storage is a viable option for a backing store;
+> availability is a notorious problem for that, and the likelihood of data loss
+> is very high.
+>
+> Edit: A typical price for non-AWS/Azure/GCP storage at various providers is
+> $5/TB/month.
+
+TODO: trim
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/38
+
+> No. (for running an S3 replacement on our own) **We barely manage to maintain the
+> infra we already have.** And in one month we’re supposed to start maintaining
+> this? If this doesn’t work for an hour, noone will be able to pull stuff from
+> cache.nixos.org 1 (except lucky stuff cached by Fastly I guess).
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/39
+
+> This is why I also mentioned options like Backblaze B2; they charge $5 per TB
+> per month in storage, and $10 per TB of traffic, if I’m not mistaken. For 500TB
+> of data and 3TB of monthly transfer, this works out to around $2500 per month;
+> which is significantly less than the current $9000/month estimate.
+>
+> The “running your own infrastructure” option is for if costs need to be reduced
+> further than that.
+>
+> Of course there’s no reason we can’t move to something like B2 for an immediate
+> cost reduction, and then in the long term work out something more sustainable,
+> without the “shutdown in one month” pressure.
+
+### The Lightsail trick https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/40
+
+> Also, something that just occurred to me: **we may be able to significantly
+> reduce transfer-out costs by sending it through AWS Lightsail** (their VPS
+> service). If I’m not mistaken, traffic between S3 and Lightsail is free, and
+> Lightsail itself has cheaper egress.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/42
+
+#### Split the infra team in two #79 https://github.com/NixOS/foundation/issues/79
+
+> Right now, **the infra team is understaffed**. We regularly need to deploy more
+> services, and that isn't getting served because of the lack of capacity.
+
+> The main reason for keeping the infra team small is that **everybody on the team
+> has access to the binary cache signing key**. Losing that key would allow an
+> attacker to distribute malicious software with our blessing and open new
+> vectors of attack.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/47
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/48
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/49
+
+> Had a couple ideas while responding to someone on HN who also asked the “can
+> we just rebuild it all?” question:
+>
+> * I guess if there’s a bit of Pareto in the distribution of build output
+>   sizes, **there might be meaningful savings in rebuilding the packages that
+>   take up the most storage and paying to move the small stuff.**
+> * It might also be possible to triage the sources in the cache–re-fetch all
+>   that are still available from the original source or a mirror, and then just
+>   export the ones that either couldn’t be fetched or could be fetched but the
+>   contents no longer match the hash.
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/50
+
+### Storj note by the pitch guy https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/51
+
+> An admittedly biased point about Wasabi - costs increase substantially if you
+> start egressing more than 1x bytes at rest per month.
+>
+> On the other hand, the per-“segment” costs with Storj are essentially per-object
+> charges, but can be basically eliminated with some packing (e.g. zipping up lots
+> of small files together). **The Storj platform natively understands zips and can
+> pull individual files out of zips without downloading the whole zip for this
+> reason.**
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/52
+
+### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/53
+
+## matrix
+
+Amine Chikhaoui:
+> One of the particularities of Nix is that while most of the volume is handled
+> by Fastly, if upstream is down user builds will start failing immediately.
+> This is because if you write your own Nix code, the derivation hash is unique,
+> and will necessarily be a cache miss request. And Nix doesn't degrade
+> gracefully when the cache returns 50x responses.
+
+jackdk:
+> Yeah, though Glacier Flexible Retrieval and Glacier Deep Archive have
+> potentially large delays on retrievals. Unless there's a definite plan to
+> extract all the data right away, Glacier Instant Retrieval seems worth
+> considering since the CDN will mask the increased retrieval charges. ($0.01 /
+> 1000 GET vs $0.0004 / 1000 GET for S3 Standard)

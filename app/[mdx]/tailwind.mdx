@@ -1,0 +1,42 @@
+# Tailwind notes
+
+> @tailwindcss *thoroughly fixes* CSS, by removing:
+> ◆ Naming paralysis
+> ◆ Cascade side effects
+> ◆ Module import indirection
+> ◆ Declaration order side effects
+> ◆ Ergonomics (e.g.: universal `gap`)
+>
+> What a 🐐 technology.
+- [@rauchg](https://twitter.com/rauchg/status/1632171325081939968)
+
+## auto class sorting is a must
+
+Class sorting bugs are of the "silently does the wrong thing" variety.
+There are 2 strategies you can use to prevent them:
+
+- running a function to merge classes
+  ```
+  className={mergeFunc("some classes", "more classes")}
+  ```
+- (your tools) ordering classes the right way
+
+Here's how you set up class auto sorting
+(more info on [the Tailwind blog post][tba] and [Theo's video][yQ]).
+
+[yQ]: https://youtu.be/QBajvZaWLXs?t=250
+[tba]: https://tailwindcss.com/blog/automatic-class-sorting-with-prettier
+
+This assumes you've performed a default install,
+either by using something like `create-next-app`
+or installing it as per [the docs][tdi].
+
+[tdi]: https://tailwindcss.com/docs/installation
+
+You install `prettier` first
+(you likely have `eslint` set up,
+so that means [`eslint-config-prettier`][gpe]).
+Then `prettier-plugin-tailwindcss` as per its [README][gtp].
+
+[gpe]: https://github.com/prettier/eslint-config-prettier#installation
+[gtp]: https://github.com/tailwindlabs/prettier-plugin-tailwindcss

@@ -38,7 +38,6 @@
     "@tailwindcss/typography": "^0.5.9",
     "eslint-config-prettier": "^8.8.0",
     "prettier": "^2.8.8",
-    "prettier-eslint": "^15.0.1",
     "prettier-plugin-tailwindcss": "^0.3.0"
   }
 }

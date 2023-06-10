@@ -1,0 +1,43 @@
+# NixOS has a couple gotchas
+
+## It might be nicer than Ubuntu, even for normies
+
+Things that were randomly broken on my Ubuntu install that now "just work":
+
+* `bash` PS1 colors on `sh`
+* external monitor no longer force reconnects whenever I open GNOME settings or
+  some apps
+* xterm no longer randomly freezes until input once every sometimes
+
+There's the one caveat though:
+
+## npm i --global is strictly forbidden
+
+https://nixos.wiki/wiki/Node.js#Using_npm_install_-g_fails
+
+Where `npm i -g` is shorthand for "a lot of types of installs".
+And there are a lot of things like that.
+
+> if you want to setup a global development environment without using ephemeral
+> shells, the canonical nixos way to do that is "just don't"
+-- hrnz
+
+## Best of both worlds?
+
+You can get a lot of the benefits of the Nix package manager while still being
+able to copy/paste install commands from Github by foregoing NixOS and just
+using Nix with a non-immutable distro like Ubuntu or Fedora.
+
+## nix links
+
+- [nix.dev](https://nix.dev/)
+- [Use flake.nix, not Dockerfile](https://www.youtube.com/watch?v=0uixRE8xlbY)
+- [How To Setup Nix Flakes](https://www.youtube.com/watch?v=oqXWrkvZ59g) - practical intro to flakes
+- [Nix & NixOS playlist by ALT F4](https://www.youtube.com/watch?v=VTSg6lPknD0&list=PLOCuJim-jRbvrCSGPjQUklzSUQlLqJsl2)
+- [Mitchell Hashimoto's dotfiles](https://github.com/mitchellh/nixos-config)
+- [ALT F4's dotfiles](https://github.com/ALT-F4-LLC/dotfiles-nixos)
+- [Tweag's blog posts tagged Nix](https://www.tweag.io/blog/tags/nix/)
+- [noogle.dev](https://noogle.dev/) - nix function exploring
+- [Zero to Nix](https://zero-to-nix.com/) - "An unofficial, opinionated, gentle introduction to Nix"
+
+Thanks to blackglasses from the ALT F4 stream for many of these

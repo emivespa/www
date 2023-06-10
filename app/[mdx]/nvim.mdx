@@ -1,0 +1,45 @@
+# nvim config shouldn't be hard
+
+## Use full links (on any package manager)
+
+Not sure where it started,
+but most package managers have an "implicit Github" feature where `ghost/plugin` get's converted to `https:/github.com/ghost/plugin`.
+Don't use it - that way you can `gx` over the link them to go straight to the docs.
+
+## Don't inline lazy.vim dependencies
+
+Like this:
+
+```
+{
+  'https://github.com/ghost/dependent',
+  dependencies = {
+    {
+      'https://github.com/ghost/dependency',
+    }
+  },
+}
+```
+
+Seems simple enough,
+but as soon as those plugins have any config,
+it can turn into a mess pretty quickly.
+Instead, name them:
+
+```
+{
+  'https://github.com/ghost/dependent',
+  dependencies = { 'dependency', },
+},
+{
+  'https://github.com/ghost/dependency',
+  name = 'dependency',
+},
+```
+
+The one gotcha:
+if you change the URL but not the name,
+(say, if you switch a plugin for a fork of it)
+Lazy won't clone the new one by default.
+You open `:Lazy` and press `X` on the plugin to clean it,
+then restart nvim.

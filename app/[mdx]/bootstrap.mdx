@@ -1,36 +1,21 @@
 # create-x-app
 
-Stuff the docs don't tell you.
-
+```
 ![instructions said to test run in a barrel before installing on a boat](https://media.discordapp.net/attachments/864919812291428372/1105677587516239983/FB_IMG_16836844138238854.jpg)
+```
 
-## Tailwind
+Every new Docker user asks the same thing.
+_"Do I really need to use sudo all the time?"_
+No, you don't, no one does that, but you wouldn't know it without having to ask.
+_It's not in the install docs, it's in the "post install" docs._
 
-### start with the default install
+There's a broader problem with incomplete how-tos making people run into traps.
+This post is about the stuff the docs don't tell you.
+(Or maybe they do, but you didn't read it.)
+I'll try to be succinct,
+which means linking to docs a lot.
 
-This assumes you've performed a default install,
-either by using something like `create-next-app`
-installing it as per [the docs][tdi].
-
-[tdi]: https://tailwindcss.com/docs/installation
-
-### auto class sorting is a must
-
-Class sorting bugs are practically invisible
-To prevent them you need to set up automatic class sorting.
-More info on [the Tailwind blog post][tba] and [Theo's video][yQ].
-
-[yQ]: https://youtu.be/QBajvZaWLXs?t=250
-[tba]: https://tailwindcss.com/blog/automatic-class-sorting-with-prettier
-
-You'll have to install `prettier` first
-(if you have `eslint` set up, that means [`eslint-config-prettier`][gpe]).
-Then the `prettier-plugin-tailwindcss` plugin as per its [README][gtp].
-
-[gpe]: https://github.com/prettier/eslint-config-prettier#installation
-[gtp]: https://github.com/tailwindlabs/prettier-plugin-tailwindcss
-
-## scripts
+## Scripts run on yolo mode by default
 
 Use ["bash strict mode"][rau],
 in `bash` that's `set -euo pipefail` at the top of your script.
@@ -42,9 +27,9 @@ That blog post is OK,
 but it does not tell you how to get around `-e` and `-u`.
 And it's not so rare that you have to.
 
-`-e`: if a command is fail-safe,
+For `-e` if a command is fail-safe,
 you can let it fail by catching it within an "if" or OR-ing it with `true`
-(a command/builtin that does nothing except succeed).
+(a builtin that does nothing except succeed).
 
 ```
 if might_fail; then
@@ -52,19 +37,21 @@ fi
 might_fail_as_well || true
 ```
 
-`-u`: use parameter expansion.
+For `-u` use parameter expansion.
 
 ```
 echo "${if_this_variable_doesnt_exist:-'print this instead'}"
 ```
 
-## make
+> But why do scripts run on YOLO mode exactly?
 
-### .env
+They run pretty much like your regular bash session runs.
+If you `set -e` on an interactive bash shell,
+it would get killed as soon as a command failed.
 
-Use this snippet
-([source][r202])
-to create make variables out of `.env` values:
+## make + .env
+
+Use this snippet ([source][r202]) to create make variables out of `.env` values:
 
 [r202]: https://www.robg3d.com/2020/05/2288/
 
@@ -75,6 +62,5 @@ ifneq (,$(wildcard ./.env))
 endif
 
 .PHONY: ping
-ping:
 	ping $(HOST)
 ```
