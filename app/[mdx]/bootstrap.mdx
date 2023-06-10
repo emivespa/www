@@ -15,40 +15,6 @@ This post is about the stuff the docs don't tell you.
 I'll try to be succinct,
 which means linking to docs a lot.
 
-## Scripts run on yolo mode by default
-
-Use ["bash strict mode"][rau],
-in `bash` that's `set -euo pipefail` at the top of your script.
-in `sh` there's no `-o pipefail` but you can use `#!/bin/sh -eu`.
-
-[rau]: http://redsymbol.net/articles/unofficial-bash-strict-mode/
-
-That blog post is OK,
-but it does not tell you how to get around `-e` and `-u`.
-And it's not so rare that you have to.
-
-For `-e` if a command is fail-safe,
-you can let it fail by catching it within an "if" or OR-ing it with `true`
-(a builtin that does nothing except succeed).
-
-```
-if might_fail; then
-fi
-might_fail_as_well || true
-```
-
-For `-u` use parameter expansion.
-
-```
-echo "${if_this_variable_doesnt_exist:-'print this instead'}"
-```
-
-> But why do scripts run on YOLO mode exactly?
-
-They run pretty much like your regular bash session runs.
-If you `set -e` on an interactive bash shell,
-it would get killed as soon as a command failed.
-
 ## make + .env
 
 Use this snippet ([source][r202]) to create make variables out of `.env` values:
