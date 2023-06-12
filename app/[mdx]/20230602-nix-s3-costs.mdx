@@ -1,4 +1,4 @@
-# RE: *The NixOS Foundation’s Call to Action: S3 Costs Require Community Support*
+# RE: _The NixOS Foundation’s Call to Action: S3 Costs Require Community Support_
 
 The discussion was so meaty I started taking notes. Emphasis is mine
 
@@ -22,11 +22,11 @@ The discussion was so meaty I started taking notes. Emphasis is mine
 
 > **Deadline** - Aiming for **July 1st**
 
-> * Migrating the buckets to **Cloudflare R2** 148, and using the generous OSS
+> - Migrating the buckets to **Cloudflare R2** 148, and using the generous OSS
 >   sponsorship offer they recently announced 288. That would incur a fixed cost
 >   of around **$32k** for the migration.
 
-> * Keeping the budget, but **garbage-collecting** it. We could shrink probably
+> - Keeping the budget, but **garbage-collecting** it. We could shrink probably
 >   shrink the costs a lot (realistically up to 70%), but there are heavy
 >   tradeoffs at play here since the data in the cache is sometimes very
 >   valuable.
@@ -35,36 +35,36 @@ The discussion was so meaty I started taking notes. Emphasis is mine
 
 Some info on our AWS costs (primarily cache.nixos.org and releases.nixos.org):
 
-> * The S3 bucket for **cache.nixos.org** stores 667M objects, with **107 TiB in
+> - The S3 bucket for **cache.nixos.org** stores 667M objects, with **107 TiB in
 >   standard storage** and **318 TiB in infrequent access storage**, so **425 TiB in
 >   total**.
 >
-> * The S3 bucket for **nix-releases** (i.e. https://releases.nixos.org 5) is **25.1 TiB**
+> - The S3 bucket for **nix-releases** (i.e. https://releases.nixos.org 5) is **25.1 TiB**
 >   (mostly ISO images).
 >
-> * The S3 **storage** costs for our sponsor are about **$5500 per month**, after a $2300
+> - The S3 **storage** costs for our sponsor are about **$5500 per month**, after a $2300
 >   enterprise discount.
 >
-> * The S3 **transfer costs** are about **$900 per month**, which is mostly from 29.5 TiB
+> - The S3 **transfer costs** are about **$900 per month**, which is mostly from 29.5 TiB
 >   of traffic between S3 and Fastly for cache.nixos.org, and 2.6 TiB for
 >   releases.nixos.org. (This also appears to have a discount since the costs are
 >   $0.03 per GiB.)
 >
-> * Our Fastly traffic in April was 1508 TiB, so the CDN is amazingly effective.
+> - Our Fastly traffic in April was 1508 TiB, so the CDN is amazingly effective.
 >
-> * The runtime closure of all non-beta NixOS releases (i.e. the store paths
+> - The runtime closure of all non-beta NixOS releases (i.e. the store paths
 >   reachable from the store-paths.xz files in Channels for NixOS project(s) 5) is
 >   13M store paths, 27.1 TiB. So **garbage-collecting cache.nixos.org to only keep
 >   NixOS releases would shrink it to 6.3% of its current size**.
 >
-> * Note that this doesn’t include build-time-only dependencies like source
+> - Note that this doesn’t include build-time-only dependencies like source
 >   tarballs.
 >
-> * The runtime closure of all non-beta NixOS releases and all Nixpkgs releases is
+> - The runtime closure of all non-beta NixOS releases and all Nixpkgs releases is
 >   51M store paths, 91.4 TiB, so about 21% of the bucket. Unfortunately Nixpkgs
 >   has no stable releases, they’re all marked as “pre”.
 >
-> * So **we can reduce storage costs by almost 80% by GCing everything that isn’t
+> - So **we can reduce storage costs by almost 80% by GCing everything that isn’t
 >   reachable from the store-paths.xz** files on releases.nixos.org.
 
 ### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/4
@@ -112,7 +112,6 @@ V meaty. TODO.
 > Storage specifications:
 > NVME storage capacity 	210 TB usable (for object and NFS data transfer)
 > ```
-
 
 ### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/18
 
@@ -170,8 +169,8 @@ TODO: link, same url as breakdown.
 > In the latest post from today I found that a dedup factor of 3.5x (thus egress
 > cost reduction factor) seems immediately achievable.
 
-* https://github.com/NixOS/nixpkgs/issues/89380
-* https://github.com/NixOS/nixpkgs/issues/89380#issuecomment-1575550831
+- https://github.com/NixOS/nixpkgs/issues/89380
+- https://github.com/NixOS/nixpkgs/issues/89380#issuecomment-1575550831
 
 ### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/23
 
@@ -204,11 +203,11 @@ It was also strange to me.
 
 #### jackdk on matrix:
 
- > A lot of people keep mentioning S3 Infrequent-Access (IA) tier and/or S3
- > Intelligent Tiering.
- > https://discourse.nixos.org/t/nixos-foundations-financial-summary-a-transparent-look-into-2022/28107/16
- > shows that about 3/4 of the cache.nixos.org bucket is in IA already, and
- > intelligent tiering automation charges will be $1667.50/month
+> A lot of people keep mentioning S3 Infrequent-Access (IA) tier and/or S3
+> Intelligent Tiering.
+> https://discourse.nixos.org/t/nixos-foundations-financial-summary-a-transparent-look-into-2022/28107/16
+> shows that about 3/4 of the cache.nixos.org bucket is in IA already, and
+> intelligent tiering automation charges will be $1667.50/month
 
 ### BitTorrent was bound to come up https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/33
 
@@ -315,10 +314,10 @@ TODO: trim
 > Had a couple ideas while responding to someone on HN who also asked the “can
 > we just rebuild it all?” question:
 >
-> * I guess if there’s a bit of Pareto in the distribution of build output
+> - I guess if there’s a bit of Pareto in the distribution of build output
 >   sizes, **there might be meaningful savings in rebuilding the packages that
 >   take up the most storage and paying to move the small stuff.**
-> * It might also be possible to triage the sources in the cache–re-fetch all
+> - It might also be possible to triage the sources in the cache–re-fetch all
 >   that are still available from the original source or a mirror, and then just
 >   export the ones that either couldn’t be fetched or could be fetched but the
 >   contents no longer match the hash.
@@ -343,6 +342,7 @@ TODO: trim
 ## matrix
 
 Amine Chikhaoui:
+
 > One of the particularities of Nix is that while most of the volume is handled
 > by Fastly, if upstream is down user builds will start failing immediately.
 > This is because if you write your own Nix code, the derivation hash is unique,
@@ -350,6 +350,7 @@ Amine Chikhaoui:
 > gracefully when the cache returns 50x responses.
 
 jackdk:
+
 > Yeah, though Glacier Flexible Retrieval and Glacier Deep Archive have
 > potentially large delays on retrievals. Unless there's a definite plan to
 > extract all the data right away, Glacier Instant Retrieval seems worth
