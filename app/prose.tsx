@@ -8,7 +8,6 @@ export default function Prose({ children }: { children: React.ReactNode }) {
       max-w-[50rem]
       p-2
       dark:prose-invert
-      prose-h1:text-[Highlight]
       prose-p:text-[canvastext]
       prose-code:bg-[buttonface]
       prose-code:font-normal
