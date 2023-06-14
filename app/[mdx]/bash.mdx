@@ -5,34 +5,34 @@
 - [pure bash bible](https://github.com/dylanaraps/pure-bash-bible)
 - [pure sh bible](https://github.com/dylanaraps/pure-sh-bible)
 
-## The porcelain--plumbing pattern
+## The porcelain-plumbing pattern
 
-For longer scripts it's very practical to emulate the structure of the `git` CLI.
-A bunch of independent commands where you can call the "porcelain" ones as well
-as "plumbing" ones.
+For longer scripts it's very practical to emulate the structure of the
+`git` CLI. Make every function a subcommand you can call regardless of
+whether it's a user-facing "porcelain" ones or an internal "plumbing"
+ones:
 
 ```bash
 #!/bin/sh -eu
-foo() {
-	# ...
-}
-
-bar() {
-	# ...
-}
+helper() { printf %s\\n 'This is an internal "plumbing" command.'; return 0; }
+subcommand_1() { helper && printf %s\\n 'This is a user-facing "porcelain" command' ; }
+subcommand_2() { helper && printf %s\\n 'This is a user-facing "porcelain" command' ; }
 
 main() {
-	foo | bar
+	1>&2 printf %s\\n "usage:"
+	1>&2 printf %s\\n "	scriptx subcommand_1"
+	1>&2 printf %s\\n "	scriptx subcommand_2"
+	exit 1
 }
 
 # [flag parsing]
-# [commands that MUST run on every run]
+# [anything that MUST run every time]
 
-"${1:-main}" # Calls the specified function or main if there isn't one.
+"${1:-main}" # Calls a subcommand or main if there isn't one.
 ```
 
-You can test every function independently by running `./script foo`,
-`./script bar`.
+This is great for testing because you can call every function on it's
+own by running `scriptx helper`, `scriptx subcommand_1`.
 
 ## Scripts run on yolo mode by default
 
