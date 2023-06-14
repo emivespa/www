@@ -1,6 +1,6 @@
 # RE: _The NixOS Foundation’s Call to Action: S3 Costs Require Community Support_
 
-The discussion was so meaty I started taking notes. Emphasis is mine
+The discussion was so meaty I started taking notes. Emphasis is mine.
 
 ## discourse
 
@@ -307,7 +307,36 @@ TODO: trim
 
 ### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/47
 
+> The problem is that there are a lot of historical builds in the binary
+> cache; the binary cache doesn’t build things on-demand, but rather
+> rebuilds all the (eligible) packages every time the nixpkgs channel
+> gets updated - so that the binaries are there already once a client
+> requests them.
+
+> This means that it will never revisit past builds unless someone
+> explicitly creates a task for it. It would probably be possible to
+> retroactively do a ‘clean’ rebuild of past nixpkgs versions, but to
+> try and reproduce the entire history of nixpkgs (which is what currently
+> lives in the binary cache, more or less) would require a lot of computing
+> power. I don’t know whether that’s viable in practice.
+
 ### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/48
+
+> So, a quick survey of “S3-compatible” providers that I am aware
+> of, on a monthly basis (S3 pricing comes from Backblaze’s page, have
+> not verified):
+
+- AWS S3: $26/TB storage, $90/TB traffic, no minimum storage
+- Cloudflare R2: $15/TB storage plus ‘operation fees’, free traffic; possibly sponsorable, but this would create another sponsor dependency
+- Backblaze B2: $5/TB storage, $10/TB traffic, no minimum storage, supposedly free migration from S3
+- Wasabi: $6/TB storage, free(?) traffic, 90 days minimum storage
+- Storj: $4/TB storage plus ‘segment fee’, $7/TB traffic, no minimum storage, supposedly free migration from S3
+
+> I’d say that these seem like a viable short-term solution to migrate
+> to, so that we can hit the deadline of a month, while also significantly
+> cutting expenses; after that, it’s probably worth revisiting whether
+> something more cost-efficient is possible, and what’s possible in terms
+> of infrastructure maintenance capacity after the infra team gets split?
 
 ### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/49
 
@@ -324,7 +353,11 @@ TODO: trim
 
 ### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/50
 
-### Storj note by the pitch guy https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/51
+> When I was at Amazon, I got AWS to cover crate.io’s hosting costs 17. AWS has since setup an open-source sponsorship program that gives out
+> AWS credits with a (last I checked) not-unreasonable application process,
+> and it might be worthwhile to apply if you haven’t already.
+
+### Wasabi VS Storj note by the pitch guy https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/51
 
 > An admittedly biased point about Wasabi - costs increase substantially if you
 > start egressing more than 1x bytes at rest per month.
@@ -334,8 +367,6 @@ TODO: trim
 > of small files together). **The Storj platform natively understands zips and can
 > pull individual files out of zips without downloading the whole zip for this
 > reason.**
-
-### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/52
 
 ### https://discourse.nixos.org/t/the-nixos-foundations-call-to-action-s3-costs-require-community-support/28672/53
 
