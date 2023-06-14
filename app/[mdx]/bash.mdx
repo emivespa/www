@@ -1,9 +1,38 @@
-# bash is mostly tips and tricks
+# bash tips and tricks
 
-Resources:
+## bash links
 
-* [pure bash bible  ](https://github.com/dylanaraps/pure-bash-bible)
-* [pure sh bible    ](https://github.com/dylanaraps/pure-sh-bible)
+- [pure bash bible](https://github.com/dylanaraps/pure-bash-bible)
+- [pure sh bible](https://github.com/dylanaraps/pure-sh-bible)
+
+## The porcelain--plumbing pattern
+
+For longer scripts it's very practical to emulate the structure of the `git` CLI.
+A bunch of independent commands where you can call the "porcelain" ones as well
+as "plumbing" ones.
+
+```bash
+#!/bin/sh -eu
+foo() {
+	# ...
+}
+
+bar() {
+	# ...
+}
+
+main() {
+	foo | bar
+}
+
+# [flag parsing]
+# [commands that MUST run on every run]
+
+"${1:-main}" # Calls the specified function or main if there isn't one.
+```
+
+You can test every function independently by running `./script foo`,
+`./script bar`.
 
 ## Scripts run on yolo mode by default
 
@@ -59,6 +88,32 @@ and you can use this to asign the first available command to a variable:
 
 ```
 cmd="$(command -v curl || command -v wget)" || exit 1
+```
+
+## Parse argv
+
+```bash
+while [ "$#" -gt 0 ]; do
+	case "$1" in
+		(-v|--version) VERSION="$2"; shift 2;;
+		(-p|--platform) PLATFORM="$2"; shift 2;;
+		(-P|--prefix) PREFIX="$2"; shift 2;;
+		(-a|--arch) ARCH="$2"; shift 2;;
+
+		(-V|--verbose) VERBOSE=1; shift 1;;
+		(-f|-y|--force|--yes) FORCE=1; shift 1;;
+
+		(-v=*|--version=*) VERSION="${1#*=}"; shift 1;;
+		(-p=*|--platform=*) PLATFORM="${1#*=}"; shift 1;;
+		(-P=*|--prefix=*) PREFIX="${1#*=}"; shift 1;;
+		(-a=*|--arch=*) ARCH="${1#*=}"; shift 1;;
+		(-V=*|--verbose=*) VERBOSE="${1#*=}"; shift 1;;
+		(-f=*|-y=*|--force=*|--yes=*) FORCE="${1#*=}"; shift 1;;
+
+		(-*) error "Unknown option: $1"; exit 2;;
+		(*) VERSION="$1"; shift 1;;
+	esac
+done
 ```
 
 ## one-liner dump
