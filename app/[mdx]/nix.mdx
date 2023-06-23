@@ -1,5 +1,7 @@
 # Nix has a couple gotchas
 
+[(Incomplete) notes on the Nix's S3 costs saga](./20230602-nix-s3-costs)
+
 ## nix links
 
 - [nix.dev](https://nix.dev/)
@@ -14,22 +16,109 @@
 
 Thanks to blackglasses from the ALT F4 stream for many of these
 
-## NixOS
 
-### npm install --global is strictly forbidden
+## NixOS: Everything you know is strictly forbidden
 
-https://nixos.wiki/wiki/Node.js#Using_npm_install_-g_fails
+You can't `npm i -g` stuff on NixOS.
+([wiki entry](https://nixos.wiki/wiki/Node.js#Using_npm_install_-g_fails)).
 
-This applies to a lot of things.
-You can't even clone a C project and `make install`.
+You can't just clone a project and `sudo make install` like some animal
+
+You can't use most ways of installing stuff.
+`/usr/bin/` is read-only.
 
 > if you want to setup a global development environment without using ephemeral
 > shells, the canonical nixos way to do that is "just don't"
 
 -- hrnz
 
-### You don't need NixOS
+```
+/!\ UNDER CONSTRUCTION /!\
+```
+
+## You don't actually need NixOS
 
 You can get a lot of the benefits of the Nix package manager while still being
 able to copy/paste install commands from Github by foregoing NixOS and just
 using Nix with a non-immutable distro like Ubuntu or Fedora.
+
+## Enough nix to be dangerous
+
+Ok, so you know not to dive head first into NixOS until you're somewhat confortable with Nix.
+How far should you go before you make the switch?
+You should be able to build and install a binary that has at least one non-packaged dependency.
+
+### NixOS survival guide
+
+[💻 NixOS ain't worth it](https://port19.xyz/tech/nixos/):
+
+> If you google an issue, the solutions you find will likely not apply.
+>
+> Worse, the knowledge and skill you gain will not cary over to more traditional distros like debian or arch.
+>
+> Nix os vs arch is more like openbsd vs arch rather than debian vs arch.
+>
+> Sure, the kernel is still linux, but the whole system will feel unfamiliar.
+>
+> Ask yourself, is reproducibility via configuration.nix worth it?
+>
+> Or would you rather maintain your dotfiles and a package list?
+>
+> Do you always need more or is arch + aur enough software?
+>
+> Are rollbacks important to you and do you also have beef with the timeshift maintainer?
+>
+> If you're unsure, stay away from nix os.
+
+[hlissner/dotfiles] (https://github.com/hlissner/dotfiles):
+
+> **Hey,** you. You're finally awake. You were trying to configure your OS
+> declaratively, right? Walked right into that NixOS ambush, same as us,
+> and those dotfiles over there.
+
+```
+/!\ UNDER CONSTRUCTION /!\
+```
+
+## devShell all the things
+
+Dev shells obviate version managers as a category, so no need to use
+`nvm` (or `fnm`) for Node,
+`tfenv` for Terraform,
+`gvm` for go,
+and so on.
+(You can think of your nix as the version manager to rule them all, I guess.)
+
+Heres a simple flake with just a devshell:
+
+```nix
+# flake.nix
+{
+  description = "";
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+  };
+  outputs = { self, nixpkgs, flake-utils }:
+    flake-utils.lib.eachDefaultSystem (system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        packages = with pkgs; [ figlet ];
+      in {
+        devShells.default = pkgs.mkShell {
+          packages = packages;
+          shellHook = "echo 'entering dev shell'";
+        };
+      });
+}
+```
+
+You can use `nix develop` to run it, but you want to make it automatic with direnv:
+
+```
+echo 'use flake' >>./.envrc
+```
+
+## You probably don't need home-manager either
+
+Can be tempting since everyone tells you to use it but I'd advice against it.
