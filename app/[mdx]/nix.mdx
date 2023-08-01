@@ -22,9 +22,9 @@ Thanks to blackglasses from the ALT F4 stream for many of these
 You can't `npm i -g` stuff on NixOS.
 ([wiki entry](https://nixos.wiki/wiki/Node.js#Using_npm_install_-g_fails)).
 
-You can't just clone a project and `sudo make install` like some animal
+You can't just clone a project and `sudo make install` to a global prefix like some animal.
 
-You can't use most ways of installing stuff.
+You can't use most ways of installing stuff globally.
 `/usr/bin/` is read-only.
 
 > if you want to setup a global development environment without using ephemeral
@@ -118,6 +118,10 @@ You can use `nix develop` to run it, but you want to make it automatic with dire
 ```
 echo 'use flake' >>./.envrc
 ```
+
+### Have your Dockerfile match your flake exactly
+
+- https://mitchellh.com/writing/nix-with-dockerfiles
 
 ## You probably don't need home-manager either
 
